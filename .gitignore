@@ -2,7 +2,8 @@
 node_modules/
 **/node_modules/
 
-# Local Environment Variables
+# Local Environment Variables and Folders
+data/
 .env
 client/.env
 admin/.env
