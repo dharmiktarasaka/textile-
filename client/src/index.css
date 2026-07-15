@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom premium glassmorphism scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Custom B2B Theme Color Utilities Fallbacks (Light Blue theme) */
+.bg-brand-primary {
+  background-color: #0ea5e9 !important;
+}
+.hover\:bg-brand-primary:hover,
+.hover\:bg-sky-600:hover {
+  background-color: #0284c7 !important;
+}
+.bg-brand-orange {
+  background-color: #0ea5e9 !important; /* Replaced orange with B2B light blue */
+}
+.hover\:bg-brand-orange:hover,
+.hover\:bg-orange-600:hover {
+  background-color: #0284c7 !important; /* Replaced orange hover with blue hover */
+}
+.text-brand-primary {
+  color: #0ea5e9 !important;
+}
+.text-brand-orange {
+  color: #0ea5e9 !important; /* Replaced orange text with blue text */
+}
+.border-brand-primary {
+  border-color: #0ea5e9 !important;
+}
+.border-brand-orange {
+  border-color: #0ea5e9 !important; /* Replaced orange border with blue border */
+}
+.shadow-brand-primary\/20,
+.shadow-brand-orange\/20,
+.shadow-sky-500\/20,
+.shadow-orange-500\/20 {
+  --tw-shadow-color: rgba(14, 165, 233, 0.2) !important;
+}

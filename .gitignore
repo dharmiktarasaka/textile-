@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Local Environment Variables
+.env
+client/.env
+admin/.env
+server/.env
+**/.env
+**/*.env.local
+
+# Build folders
+dist/
+**/dist/
+build/
+**/build/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

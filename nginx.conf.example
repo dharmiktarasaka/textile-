@@ -1,0 +1,70 @@
+# Nginx Server Configuration Example for Hostinger VPS (Ubuntu)
+# Places this file or configuration inside /etc/nginx/sites-available/textilewastehub
+# Then symlink it: ln -s /etc/nginx/sites-available/textilewastehub /etc/nginx/sites-enabled/
+
+# ==========================================
+# 1. Company User Portal (Main Domain)
+# ==========================================
+server {
+    listen 80;
+    server_name textilewastehub.com www.textilewastehub.com;
+
+    # Static build path for Client React App
+    root /var/www/textilewastehub/client/dist;
+    index index.html;
+
+    # Redirect standard traffic to HTTPS once Certbot is configured
+    # return 301 https://$host$request_uri;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API requests to Node server
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Proxy private verification document streams
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:5000/uploads/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+# ==========================================
+# 2. Platform Admin Portal (Subdomain)
+# ==========================================
+server {
+    listen 80;
+    server_name admin.textilewastehub.com;
+
+    # Static build path for Admin React App
+    root /var/www/textilewastehub/admin/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API requests to Node server
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
