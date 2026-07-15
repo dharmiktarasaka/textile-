@@ -36,11 +36,21 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Blocked by CORS policy'));
+      if (!origin) {
+        return callback(null, true);
       }
+      
+      // Allow specified origins
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+
+      // Allow any Vercel preview or production subdomain
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
+      callback(new Error('Blocked by CORS policy'));
     },
     credentials: true,
   })
