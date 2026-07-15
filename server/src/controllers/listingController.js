@@ -40,7 +40,7 @@ const createListing = async (req, res, next) => {
     }
 
     // Process uploaded photos
-    const photoUrls = req.files.map(file => file.filename);
+    const photoUrls = req.files.map(file => file.path || file.filename);
 
     // Set default expiration to 30 days if not specified
     const expirationDate = expiresAt ? new Date(expiresAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);

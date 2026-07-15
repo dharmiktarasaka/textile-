@@ -18,7 +18,7 @@ const uploadVerificationDoc = async (req, res, next) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const filename = req.file.filename;
+    const filename = req.file.path || req.file.filename;
 
     const company = await Company.findByIdAndUpdate(
       req.company._id,

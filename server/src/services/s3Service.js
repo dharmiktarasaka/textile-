@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 
 const getSignedUrl = (filename, companyId) => {
   if (!filename) return null;
+  if (filename.startsWith('http')) return filename;
 
   // Generate a short-lived token specifically for viewing this file
   const token = jwt.sign(
