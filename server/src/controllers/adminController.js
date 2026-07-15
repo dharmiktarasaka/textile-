@@ -331,7 +331,7 @@ const getPendingListings = async (req, res, next) => {
 const approveListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id)
-      .populate('companyId', 'name contactEmail')
+      .populate('companyId', 'name contactEmail contactPersonName')
       .populate('categoryId', 'name');
 
     if (!listing) {
@@ -347,7 +347,7 @@ const approveListing = async (req, res, next) => {
     // Trigger the matching engine now that it's approved
     matchAndNotify(listing).catch(err => console.error('Match engine error:', err));
 
-    // Notify the seller
+    // Notify the seller via in-app notification
     const title = 'Product Listing Approved';
     const message = `Your product "${listing.title}" has been approved and is now live on the marketplace.`;
 
@@ -367,6 +367,25 @@ const approveListing = async (req, res, next) => {
       channel: 'email',
     });
 
+    // Send actual email notification to the registered user email
+    try {
+      await sendEmail({
+        to: listing.companyId.contactEmail,
+        subject: 'Product Listing Approved - TextileWasteHub',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #0284c7; text-align: center; border-bottom: 2px solid #0284c7; padding-bottom: 10px;">Listing Approved</h2>
+            <p>Hello ${listing.companyId.contactPersonName || 'Seller'},</p>
+            <p>We are pleased to inform you that your product listing <strong>"${listing.title}"</strong> has been approved by our administrators and is now live on the marketplace.</p>
+            <p>Interested buyers will now be able to view and contact you regarding this listing.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/listings/${listing._id}" style="background-color: #0284c7; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">View Listing</a></p>
+          </div>
+        `
+      });
+    } catch (emailErr) {
+      console.error('Failed to send listing approval email:', emailErr.message);
+    }
+
     return res.status(200).json({
       message: 'Listing approved and is now active',
       listing,
@@ -383,7 +402,7 @@ const rejectListing = async (req, res, next) => {
   try {
     const { reason } = req.body;
     const listing = await Listing.findById(req.params.id)
-      .populate('companyId', 'name contactEmail');
+      .populate('companyId', 'name contactEmail contactPersonName');
 
     if (!listing) {
       return res.status(404).json({ message: 'Listing not found' });
@@ -396,7 +415,7 @@ const rejectListing = async (req, res, next) => {
     listing.rejectionReason = reason || 'Product photos or details do not meet our quality guidelines.';
     await listing.save();
 
-    // Notify the seller
+    // Notify the seller via in-app notification
     const title = 'Product Listing Rejected';
     const message = `Your product "${listing.title}" was not approved. Reason: ${listing.rejectionReason}`;
 
@@ -415,6 +434,26 @@ const rejectListing = async (req, res, next) => {
       message,
       channel: 'email',
     });
+
+    // Send actual email notification to the registered user email
+    try {
+      await sendEmail({
+        to: listing.companyId.contactEmail,
+        subject: 'Product Listing Update - TextileWasteHub',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #ef4444; text-align: center; border-bottom: 2px solid #ef4444; padding-bottom: 10px;">Listing Not Approved</h2>
+            <p>Hello ${listing.companyId.contactPersonName || 'Seller'},</p>
+            <p>We regret to inform you that your product listing <strong>"${listing.title}"</strong> was not approved by our administrators.</p>
+            <p><strong>Reason:</strong> ${listing.rejectionReason}</p>
+            <p>Please update your listing details or images according to the feedback and resubmit for review.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background-color: #ef4444; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Go to Portal</a></p>
+          </div>
+        `
+      });
+    } catch (emailErr) {
+      console.error('Failed to send listing rejection email:', emailErr.message);
+    }
 
     return res.status(200).json({
       message: 'Listing rejected',
