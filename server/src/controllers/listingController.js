@@ -122,10 +122,11 @@ const getListings = async (req, res, next) => {
 
     const total = await Listing.countDocuments(query);
 
-    const getRatingForListing = async (listingId) => {
+    const getRatingForListing = async (companyId) => {
+      if (!companyId) return { ratingAvg: 0, reviewCount: 0 };
       const stats = await Review.aggregate([
-        { $match: { listingId: new (require('mongoose').Types.ObjectId)(listingId) } },
-        { $group: { _id: '$listingId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+        { $match: { targetCompanyId: new (require('mongoose').Types.ObjectId)(companyId) } },
+        { $group: { _id: '$targetCompanyId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
       ]);
       if (stats.length > 0) {
         return {
@@ -138,7 +139,7 @@ const getListings = async (req, res, next) => {
 
     const listingsWithRatings = await Promise.all(
       listings.map(async (listing) => {
-        const ratingInfo = await getRatingForListing(listing._id);
+        const ratingInfo = await getRatingForListing(listing.companyId?._id || listing.companyId);
         const obj = listing.toObject();
         obj.ratingAvg = ratingInfo.ratingAvg;
         obj.reviewCount = ratingInfo.reviewCount;
@@ -233,8 +234,8 @@ const getListingById = async (req, res, next) => {
     }
 
     const stats = await Review.aggregate([
-      { $match: { listingId: new (require('mongoose').Types.ObjectId)(listing._id) } },
-      { $group: { _id: '$listingId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+      { $match: { targetCompanyId: new (require('mongoose').Types.ObjectId)(listing.companyId._id || listing.companyId) } },
+      { $group: { _id: '$targetCompanyId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
     ]);
     
     let ratingAvg = 0;
@@ -354,10 +355,11 @@ const getPublicLatestListings = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .limit(6);
 
-    const getRatingForListing = async (listingId) => {
+    const getRatingForListing = async (companyId) => {
+      if (!companyId) return { ratingAvg: 0, reviewCount: 0 };
       const stats = await Review.aggregate([
-        { $match: { listingId: new (require('mongoose').Types.ObjectId)(listingId) } },
-        { $group: { _id: '$listingId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+        { $match: { targetCompanyId: new (require('mongoose').Types.ObjectId)(companyId) } },
+        { $group: { _id: '$targetCompanyId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
       ]);
       if (stats.length > 0) {
         return {
@@ -365,15 +367,12 @@ const getPublicLatestListings = async (req, res, next) => {
           reviewCount: stats[0].count
         };
       }
-      const numId = parseInt(listingId.toString().substring(18, 24), 16) || 0;
-      const ratingAvg = 4.0 + (numId % 10) / 10;
-      const reviewCount = 5 + (numId % 25);
-      return { ratingAvg, reviewCount };
+      return { ratingAvg: 0, reviewCount: 0 };
     };
 
     const listingsWithRatings = await Promise.all(
       listings.map(async (listing) => {
-        const ratingInfo = await getRatingForListing(listing._id);
+        const ratingInfo = await getRatingForListing(listing.companyId?._id || listing.companyId);
         const obj = listing.toObject();
         obj.ratingAvg = ratingInfo.ratingAvg;
         obj.reviewCount = ratingInfo.reviewCount;

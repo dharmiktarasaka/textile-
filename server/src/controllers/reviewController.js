@@ -55,7 +55,12 @@ const getListingReviews = async (req, res, next) => {
   try {
     const { listingId } = req.params;
 
-    const reviews = await Review.find({ listingId })
+    const listing = await Listing.findById(listingId);
+    if (!listing) {
+      return res.status(404).json({ message: 'Listing not found' });
+    }
+
+    const reviews = await Review.find({ targetCompanyId: listing.companyId })
       .populate('reviewerCompanyId', 'name city state verificationStatus')
       .sort({ createdAt: -1 });
 

@@ -369,9 +369,9 @@ const Landing = () => {
                       {/* Ratings stars fallbacks */}
                       <div className="flex items-center space-x-1.5 text-[10px]">
                         <div className="flex items-center">
-                          {renderStars(product.ratingAvg || 4.5)}
+                          {renderStars(product.ratingAvg || 0)}
                         </div>
-                        <span className="text-slate-400">({product.reviewCount || 10})</span>
+                        <span className="text-slate-400">({product.reviewCount || 0})</span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs pt-1 border-t border-slate-100">

@@ -228,12 +228,12 @@ const ListingDetail = () => {
               <h1 className="text-2xl md:text-3xl font-extrabold text-navy-900 leading-tight">{listing.title}</h1>
               
               <div className="flex items-center space-x-2 text-sm pb-4 border-b border-slate-100">
-                <span className="font-bold text-slate-800">{listing.ratingAvg?.toFixed(1) || '4.5'}</span>
+                <span className="font-bold text-slate-800">{listing.ratingAvg ? listing.ratingAvg.toFixed(1) : '0.0'}</span>
                 <div className="flex items-center">
-                  {renderStars(listing.ratingAvg || 4.5)}
+                  {renderStars(listing.ratingAvg || 0)}
                 </div>
                 <span className="text-sky-600 hover:underline cursor-pointer font-medium" onClick={() => setActiveTab('reviews')}>
-                  {listing.reviewCount || 12} customer reviews
+                  {listing.reviewCount || 0} customer reviews
                 </span>
               </div>
             </div>

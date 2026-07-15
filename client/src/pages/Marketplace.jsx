@@ -403,11 +403,11 @@ const Marketplace = () => {
 
                       {/* Stars Rating block */}
                       <div className="flex items-center space-x-2 text-xs">
-                        <span className="font-bold text-slate-700">{listing.ratingAvg?.toFixed(1) || '4.5'}</span>
+                        <span className="font-bold text-slate-700">{listing.ratingAvg ? listing.ratingAvg.toFixed(1) : '0.0'}</span>
                         <div className="flex items-center">
-                          {renderStars(listing.ratingAvg || 4.5)}
+                          {renderStars(listing.ratingAvg || 0)}
                         </div>
-                        <span className="text-slate-400">({listing.reviewCount || 12} reviews)</span>
+                        <span className="text-slate-400">({listing.reviewCount || 0} reviews)</span>
                       </div>
 
                       <div className="text-xs text-slate-500 flex items-center space-x-2">
