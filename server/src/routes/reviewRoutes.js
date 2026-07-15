@@ -10,7 +10,7 @@ router.use(authenticateJWT);
 // Publicly read listing reviews
 router.get('/listing/:listingId', getListingReviews);
 
-// Add review requires a fully verified company
-router.post('/', requireVerifiedCompany, createReview);
+// Add review requires authentication
+router.post('/', createReview);
 
 module.exports = router;
